@@ -1,0 +1,26 @@
+id,email_text,gold_sentiment,gold_reason,scenario_group
+1,"I absolutely love the new dashboard, great improvement!",positive,clear positive tone,UI_update
+2,"New pricing page loaded weirdly, idk what changed",,"missing details, ambiguous tone",UI_update
+3,The update looks okay but I have nothing else to add.,neutral,"minimal cue, weak justification",UI_update
+4,Pricing increase is frustrating and unnecessary,negative,strong negative wording,Pricing_issue
+5,The agent was helpful and resolved my issue quickly,positive,resolved issue and satisfaction,Support_feedback
+6,System crashed yesterday but today it is fine,neutral,inconsistent experience,Product_stability
+7,"Not sure why things changed, not necessarily worse but confusing rn",,,UI_update
+8,"The new dashboard is okay, but honestly I still use the old workflow",neutral,mixed behaviour,UI_update
+9,"This new workflow does not align with our approvals, we reverted",negative,reverse-adoption behaviour,Workflow_alignment
+10,"I think pricing is fair actually, I get more value now",positive,value justification,Pricing_issue
+11,Why did my plan change without notice??,negative,dissatisfaction due to lack of communication,Pricing_issue
+12,The price change isn’t great but the additional analytics help,neutral,tradeoff between change and added benefits,Pricing_issue
+13,"I don't care about pricing, my finance approves anyway",neutral,indifference,Pricing_issue
+14,"I really dislike this redesign, wasted so much time adjusting",negative,frustration and time lost,UI_update
+15,"Support experience okay, not great… they took 3 days",neutral,delayed resolution,Support_feedback
+16,"Still waiting for someone to respond, this is ridiculous",negative,unresolved request,Support_feedback
+17,Support got back but didn't read what I wrote properly,negative,incorrect or incomplete handling,Support_feedback
+18,"I got partial help, had to figure the rest myself",,unclear sentiment,Support_feedback
+19,Chatbot helped initially but escalation was smooth,positive,multi-step resolution went well,Support_feedback
+20,"Sometimes the tool logs me out randomly, happened 4 times",negative,friction with usability,Product_stability
+21,"I think the system is more stable now, fewer errors this week",positive,measurable improvement,Product_stability
+22,Not sure if the system changed or maybe I just got lucky,,uncertain/self-awareness,Product_stability
+23,"UI update seems fine, honestly not a big change for me",neutral,minimal perceived impact,UI_update
+24,"After this update I find everything faster, thank you team",positive,speed improvement appreciation,UI_update
+25,"The new workflow is cleaner, onboarding was easier for new hires",positive,lower onboarding friction,Workflow_alignment
