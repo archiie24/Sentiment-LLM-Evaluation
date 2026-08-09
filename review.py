@@ -83,6 +83,16 @@ def apply_human_review(
 
     reviewed = pd.read_csv(reviewed_csv)
 
+    reviewed["id"] = pd.to_numeric(
+        reviewed["id"],
+        errors="coerce"
+    ).astype("Int64")
+
+    results_df["id"] = pd.to_numeric(
+        results_df["id"],
+        errors="coerce"
+    ).astype("Int64")
+
     reviewed = reviewed[
         [
             "id",
