@@ -1,19 +1,17 @@
 # LLM Evaluation Framework
 
-A Treater-inspired framework for evaluating customer email sentiment using a local LLM (Ollama + Llama 3.2). The project compares multiple prompting strategies, validates outputs using rule-based guardrails, and supports human-in-the-loop review for reliable sentiment classification.
-
----
+A Treater-inspired framework for evaluating customer email sentiment using a local LLM (**Ollama + Llama 3.2**). The project compares multiple prompting strategies, uses an LLM judge to resolve disagreements, applies confidence-based review rules, and supports **human-in-the-loop validation** for reliable sentiment classification.
 
 ## Features
 
 - Dual-prompt sentiment evaluation
 - Batch inference with Ollama (Llama 3.2)
-- Confidence-based output selection
-- Rule-based guardrail validation
+- LLM-as-a-Judge comparison within the same LLM call
+- Confidence-based uncertainty detection
 - Human review queue generation
+- Persistent LLM results for reproducible human review
 - Final approved sentiment export
-
----
+- Gold dataset generation from human-reviewed results
 
 ## Tech Stack
 
@@ -22,11 +20,9 @@ A Treater-inspired framework for evaluating customer email sentiment using a loc
 - Pandas
 - Jupyter Notebook
 
----
-
 ## Project Structure
 
-```
+```text
 LLM-Evaluation-Framework/
 │
 ├── main.py
@@ -40,65 +36,3 @@ LLM-Evaluation-Framework/
 ├── notebooks/
 ├── README.md
 └── requirements.txt
-```
-
----
-
-## Pipeline
-
-```
-Customer Emails
-      │
-      ▼
-Prompt A & Prompt B
-      │
-      ▼
-Confidence Comparison
-      │
-      ▼
-Guardrail Validation
-      │
-      ▼
-Human Review (if needed)
-      │
-      ▼
-Final Approved Output
-```
-
----
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/<your-username>/LLM-Evaluation-Framework.git
-cd LLM-Evaluation-Framework
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Download the model:
-
-```bash
-ollama pull llama3.2
-```
-
-Run the project:
-
-```bash
-python main.py
-```
-
----
-
-## Future Improvements
-
-- Multi-model evaluation
-- LLM-as-a-Judge scoring
-- Dashboard for evaluation metrics
-- RAG integration
