@@ -1,8 +1,5 @@
-"""
-Evaluation utilities for the LLM Evaluation Framework.
-"""
-
 import pandas as pd
+
 from config import LOW_CONFIDENCE_THRESHOLD
 
 
@@ -12,7 +9,8 @@ from config import LOW_CONFIDENCE_THRESHOLD
 
 def results_to_dataframe(results_dict, df):
     """
-    Converts the nested LLM output dictionary into a DataFrame.
+    Converts the nested LLM output dictionary
+    into a DataFrame.
     """
 
     rows = []
@@ -23,33 +21,73 @@ def results_to_dataframe(results_dict, df):
         B = content.get("B", {})
         J = content.get("judge", {})
 
-        email_text = df.loc[int(eid), "email_text"]
+        email_text = df.loc[
+            int(eid),
+            "email_text"
+        ]
 
         gold = None
+
         if "gold_reason" in df.columns:
-            gold = df.loc[int(eid), "gold_reason"]
 
-        A_conf = float(A.get("confidence", 0) or 0)
-        B_conf = float(B.get("confidence", 0) or 0)
+            gold = df.loc[
+                int(eid),
+                "gold_reason"
+            ]
 
-        # -------------------------------
-        # Select higher confidence result
-        # -------------------------------
+        A_conf = float(
+            A.get("confidence", 0) or 0
+        )
 
-        if A_conf > B_conf:
+        B_conf = float(
+            B.get("confidence", 0) or 0
+        )
 
-            final_label = A.get("sentiment")
-            selected = "A"
+        judge_winner = J.get(
+            "winner",
+            "same"
+        )
 
-        elif B_conf > A_conf:
+        # --------------------------------------------------
+        # Select Final Prediction
+        # --------------------------------------------------
 
-            final_label = B.get("sentiment")
-            selected = "B"
+        if judge_winner == "A":
+
+            final_label = A.get(
+                "sentiment"
+            )
+
+            selected = "judge_A"
+
+        elif judge_winner == "B":
+
+            final_label = B.get(
+                "sentiment"
+            )
+
+            selected = "judge_B"
 
         else:
 
-            final_label = A.get("sentiment")
-            selected = "same_confidence"
+            # If judge cannot distinguish,
+            # use confidence as fallback.
+
+            if A_conf >= B_conf:
+
+                final_label = A.get(
+                    "sentiment"
+                )
+
+                selected = "confidence_A"
+
+            else:
+
+                final_label = B.get(
+                    "sentiment"
+                )
+
+                selected = "confidence_B"
 
         rows.append({
 
@@ -59,20 +97,42 @@ def results_to_dataframe(results_dict, df):
 
             "gold_reason": gold,
 
-            "A_sentiment": A.get("sentiment"),
-            "A_confidence": A_conf,
-            "A_reason": A.get("reason"),
+            "A_sentiment":
+                A.get("sentiment"),
 
-            "B_sentiment": B.get("sentiment"),
-            "B_confidence": B_conf,
-            "B_reason": B.get("reason"),
+            "A_confidence":
+                A_conf,
 
-            "judge_suggested": J.get("suggested_sentiment"),
-            "judge_difference": J.get("difference"),
-            "judge_explanation": J.get("explanation"),
+            "A_reason":
+                A.get("reason"),
 
-            "final_sentiment": final_label,
-            "selected_by": selected
+            "B_sentiment":
+                B.get("sentiment"),
+
+            "B_confidence":
+                B_conf,
+
+            "B_reason":
+                B.get("reason"),
+
+            "judge_winner":
+                judge_winner,
+
+            "judge_suggested":
+                J.get(
+                    "suggested_sentiment"
+                ),
+
+            "judge_explanation":
+                J.get(
+                    "explanation"
+                ),
+
+            "final_sentiment":
+                final_label,
+
+            "selected_by":
+                selected
 
         })
 
@@ -83,28 +143,35 @@ def results_to_dataframe(results_dict, df):
 # Review Flags
 # ==========================================================
 
-def add_review_flags(results_df,
-                     low_conf=LOW_CONFIDENCE_THRESHOLD):
+def add_review_flags(
+    results_df,
+    low_conf=LOW_CONFIDENCE_THRESHOLD
+):
     """
     Flags uncertain predictions for manual review.
     """
 
     def needs_review(row):
 
-        if row["A_confidence"] < low_conf and \
-           row["B_confidence"] < low_conf:
-
+        # Both predictions have low confidence
+        if (
+            row["A_confidence"] < low_conf
+            and
+            row["B_confidence"] < low_conf
+        ):
             return "Both confidences low"
 
-        if row["A_sentiment"] != row["B_sentiment"]:
-
-            return "Prompt A and Prompt B disagree"
+        # Judge cannot distinguish between predictions
+        if row["judge_winner"] == "same":
+            return "Judge could not distinguish predictions"
 
         return None
 
-    results_df["review_reason"] = results_df.apply(
-        needs_review,
-        axis=1
+    results_df["review_reason"] = (
+        results_df.apply(
+            needs_review,
+            axis=1
+        )
     )
 
     results_df["needs_review"] = (
@@ -112,7 +179,6 @@ def add_review_flags(results_df,
     )
 
     return results_df
-
 
 # ==========================================================
 # Dataset Summary
@@ -139,19 +205,27 @@ def summarize_results(results_df):
 
     print("Needs Review:")
 
-    print(results_df["needs_review"].sum())
+    print(
+        results_df["needs_review"].sum()
+    )
 
     print()
 
     print("Selected By")
 
-    print(results_df["selected_by"].value_counts())
+    print(
+        results_df["selected_by"]
+        .value_counts()
+    )
 
     print()
 
     print("Final Sentiment Distribution")
 
-    print(results_df["final_sentiment"].value_counts())
+    print(
+        results_df["final_sentiment"]
+        .value_counts()
+    )
 
     print("=" * 50)
 
@@ -161,22 +235,32 @@ def summarize_results(results_df):
 # ==========================================================
 
 def confidence_statistics(results_df):
-    """
-    Returns average confidence values.
-    """
 
     return {
-
         "Average A Confidence":
             results_df["A_confidence"].mean(),
 
         "Average B Confidence":
             results_df["B_confidence"].mean(),
 
-        "Higher A":
-            (results_df["selected_by"] == "A").sum(),
+        "A Higher Confidence":
+            (
+                results_df["A_confidence"]
+                >
+                results_df["B_confidence"]
+            ).sum(),
 
-        "Higher B":
-            (results_df["selected_by"] == "B").sum()
+        "B Higher Confidence":
+            (
+                results_df["B_confidence"]
+                >
+                results_df["A_confidence"]
+            ).sum(),
 
+        "Equal Confidence":
+            (
+                results_df["A_confidence"]
+                ==
+                results_df["B_confidence"]
+            ).sum()
     }
