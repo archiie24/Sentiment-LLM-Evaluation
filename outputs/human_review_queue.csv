@@ -1,0 +1,3 @@
+id,email,final_sentiment,A_sentiment,A_confidence,B_sentiment,B_confidence,review_reason
+22,Not sure if the system changed or maybe I just got lucky,neutral,neutral,0.41,negative,0.59,Both confidences low
+24,"After this update I find everything faster, thank you team",positive,negative,0.42,positive,0.58,Both confidences low

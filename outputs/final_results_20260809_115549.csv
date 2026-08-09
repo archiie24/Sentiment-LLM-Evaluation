@@ -1,0 +1,26 @@
+email,final_sentiment,A_confidence,B_confidence
+"I absolutely love the new dashboard, great improvement!",positive,0.9,0.8
+"New pricing page loaded weirdly, idk what changed",negative,0.9,0.7
+The update looks okay but I have nothing else to add.,neutral,0.8,0.6
+Pricing increase is frustrating and unnecessary,negative,0.9,0.7
+The agent was helpful and resolved my issue quickly,positive,0.9,0.8
+System crashed yesterday but today it is fine,negative,0.9,0.7
+"Not sure why things changed, not necessarily worse but confusing rn",neutral,0.8,0.6
+"The new dashboard is okay, but honestly I still use the old workflow",negative,0.9,0.7
+"This new workflow does not align with our approvals, we reverted",positive,0.9,0.7
+"I think pricing is fair actually, I get more value now",negative,0.9,0.8
+Why did my plan change without notice??,neutral,0.8,0.6
+The price change isn’t great but the additional analytics help,positive,0.9,0.8
+"I don't care about pricing, my finance approves anyway",negative,0.9,0.7
+"I really dislike this redesign, wasted so much time adjusting",neutral,0.8,0.6
+"Support experience okay, not great… they took 3 days",negative,0.9,0.8
+"Still waiting for someone to respond, this is ridiculous",positive,0.9,0.7
+Support got back but didn't read what I wrote properly,negative,0.9,0.7
+"I got partial help, had to figure the rest myself",positive,0.9,0.7
+Chatbot helped initially but escalation was smooth,negative,0.9,0.7
+"Sometimes the tool logs me out randomly, happened 4 times",neutral,0.8,0.6
+"I think the system is more stable now, fewer errors this week",positive,0.83,0.0
+Not sure if the system changed or maybe I just got lucky,neutral,0.41,0.59
+"UI update seems fine, honestly not a big change for me",positive,0.67,0.33
+"After this update I find everything faster, thank you team",positive,0.42,0.58
+"The new workflow is cleaner, onboarding was easier for new hires",positive,0.29,0.71
