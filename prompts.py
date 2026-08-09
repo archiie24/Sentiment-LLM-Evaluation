@@ -9,17 +9,13 @@ Prompt templates used by the LLM Evaluation Framework.
 SYSTEM_MSG = """
 You are an expert customer sentiment analysis assistant.
 
-Your task is to analyze customer emails and return structured JSON only.
+Analyze customer emails and classify sentiment as:
+- positive
+- negative
+- neutral
 
-For every email:
-1. Evaluate using Prompt A.
-2. Evaluate using Prompt B.
-3. Compare both predictions.
-4. Select the better prediction based on confidence.
-
-Return ONLY valid JSON.
-Do not include markdown.
-Do not include explanations outside JSON.
+Always return valid JSON only.
+Do not include markdown or additional explanation.
 """.strip()
 
 
@@ -28,28 +24,22 @@ Do not include explanations outside JSON.
 # ==========================================================
 
 PROMPT_A = """
-You are a customer-experience specialist.
+Evaluate the customer email using a direct sentiment classification approach.
 
-Read the email below.
-
-Decide EXACTLY one sentiment label.
-
-Possible labels:
-
+Decide exactly one sentiment:
 - positive
 - negative
 - neutral
 
-Return JSON ONLY.
+Return JSON ONLY:
 
 {
-    "sentiment":"positive|negative|neutral",
-    "confidence":0.0,
-    "reason":"Exact quote from the email"
+    "sentiment": "positive|negative|neutral",
+    "confidence": 0.0,
+    "reason": "Exact supporting quote from the email"
 }
 
 Email:
-
 <<<EMAIL>>>
 """.strip()
 
@@ -59,25 +49,23 @@ Email:
 # ==========================================================
 
 PROMPT_B = """
-You are an expert sentiment evaluator.
+Evaluate the customer email using an emotion-first approach.
 
-Instructions:
-
-1. Identify the customer's emotion.
-2. Decide the sentiment.
+Steps:
+1. Identify the customer's underlying emotion.
+2. Determine whether the overall sentiment is positive, negative, or neutral.
 3. Assign a confidence score between 0 and 1.
-4. Support the decision using one or two exact quotes from the email.
+4. Support the decision using one or two exact quotes.
 
-Return ONLY JSON.
+Return JSON ONLY:
 
 {
-    "sentiment":"positive|negative|neutral",
-    "confidence":0.0,
-    "reason":"Relevant quote(s)"
+    "sentiment": "positive|negative|neutral",
+    "confidence": 0.0,
+    "reason": "Relevant supporting quote(s)"
 }
 
 Email:
-
 <<<EMAIL>>>
 """.strip()
 
@@ -87,28 +75,35 @@ Email:
 # ==========================================================
 
 JUDGE_PROMPT = """
-You are comparing two sentiment predictions.
+You are an independent evaluator comparing two sentiment predictions
+for the same customer email.
+
+Your task is NOT to blindly choose the prediction with the highest
+confidence.
+
+Consider:
+
+1. Whether the sentiment matches the email.
+2. Whether the supporting reason is actually supported by the email.
+3. Whether the prediction is internally consistent.
+4. The confidence score provided by each prediction.
+
+Return ONLY valid JSON:
+
+{
+    "winner": "A|B|same",
+    "suggested_sentiment": "positive|negative|neutral",
+    "explanation": "Short explanation of why this prediction is more reliable"
+}
+
+Customer Email:
+<<<EMAIL>>>
 
 Prediction A:
 <<<A>>>
 
 Prediction B:
 <<<B>>>
-
-Choose whichever prediction is more reliable.
-
-Consider:
-
-- confidence
-- quality of supporting reason
-- consistency
-
-Return ONLY JSON.
-
-{
-    "winner":"A|B|same",
-    "explanation":"short explanation"
-}
 """.strip()
 
 
@@ -119,21 +114,19 @@ Return ONLY JSON.
 REWRITE_PROMPT = """
 You are correcting a sentiment prediction.
 
-Original Email
-
+Original Email:
 <<<EMAIL>>>
 
-Previous Prediction
-
+Previous Prediction:
 <<<PREVIOUS>>>
 
 Produce a better prediction.
 
-Return ONLY JSON.
+Return ONLY JSON:
 
 {
-    "sentiment":"positive|negative|neutral",
-    "confidence":0.0,
-    "reason":"Exact supporting quote"
+    "sentiment": "positive|negative|neutral",
+    "confidence": 0.0,
+    "reason": "Exact supporting quote"
 }
 """.strip()
