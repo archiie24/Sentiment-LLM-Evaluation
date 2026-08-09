@@ -2,12 +2,11 @@
 Main entry point for the LLM Evaluation Framework.
 """
 
+import os
+import json
 import pandas as pd
 
-from config import (
-    CSV_PATH,
-    BATCH_SIZE,
-)
+from config import CSV_PATH, BATCH_SIZE
 
 from llm import run_batched_llm
 
@@ -27,16 +26,30 @@ from review import (
 )
 
 
-def load_dataset():
-    """
-    Load and preprocess the input dataset.
-    """
+PENDING_RESULTS_PATH = "outputs/pending_llm_results.json"
 
+
+def load_dataset():
     print("Loading dataset...")
 
     df = pd.read_csv(CSV_PATH)
 
     df.columns = [c.strip() for c in df.columns]
+
+    if "id" in df.columns:
+        df["id"] = pd.to_numeric(
+            df["id"],
+            errors="coerce"
+        )
+
+        df = df.dropna(subset=["id"])
+
+        df["id"] = df["id"].astype(int)
+
+        df = df.set_index(
+            "id",
+            drop=False
+        )
 
     df["email_text"] = (
         df["email_text"]
@@ -45,25 +58,15 @@ def load_dataset():
     )
 
     if "gold_reason" in df.columns:
-
         df["gold_reason"] = (
-
             df["gold_reason"]
-
             .astype(str)
-
             .str.lower()
-
             .str.strip()
-
             .replace({
-
                 "": None,
-
                 "nan": None
-
             })
-
         )
 
     print(f"Loaded {len(df)} emails.")
@@ -71,105 +74,111 @@ def load_dataset():
     return df
 
 
-def main():
+def get_llm_results(df):
 
-    # -----------------------------------------------------
-    # Load Dataset
-    # -----------------------------------------------------
+    if os.path.exists(PENDING_RESULTS_PATH):
+
+        print()
+        print("Existing LLM results found.")
+        print("Loading saved results...")
+
+        with open(
+            PENDING_RESULTS_PATH,
+            "r",
+            encoding="utf-8"
+        ) as f:
+            return json.load(f)
+
+    print()
+    print("=" * 60)
+    print("Running LLM Evaluation...")
+    print("=" * 60)
+
+    results = run_batched_llm(
+        df,
+        batch_size=BATCH_SIZE
+    )
+
+    os.makedirs(
+        "outputs",
+        exist_ok=True
+    )
+
+    with open(
+        PENDING_RESULTS_PATH,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            results,
+            f,
+            indent=2
+        )
+
+    print()
+    print(
+        f"LLM results saved to: "
+        f"{PENDING_RESULTS_PATH}"
+    )
+
+    return results
+
+
+def main():
 
     df = load_dataset()
 
-    # -----------------------------------------------------
-    # Run LLM
-    # -----------------------------------------------------
-
-    print()
-
-    print("=" * 60)
-
-    print("Running LLM Evaluation...")
-
-    print("=" * 60)
-
-    batched_results = run_batched_llm(
-
-        df,
-
-        batch_size=BATCH_SIZE
-
-    )
-
-    # -----------------------------------------------------
-    # Convert Results
-    # -----------------------------------------------------
+    batched_results = get_llm_results(df)
 
     results_df = results_to_dataframe(
-
         batched_results,
-
         df
-
     )
 
-    # -----------------------------------------------------
-    # Review Flags
-    # -----------------------------------------------------
+    results_df = add_review_flags(
+        results_df
+    )
 
-    results_df = add_review_flags(results_df)
+    summarize_results(
+        results_df
+    )
 
-    # -----------------------------------------------------
-    # Summary
-    # -----------------------------------------------------
-
-    summarize_results(results_df)
-
-    stats = confidence_statistics(results_df)
+    stats = confidence_statistics(
+        results_df
+    )
 
     print()
-
     print("Confidence Statistics")
-
     print("---------------------")
 
-    for k, v in stats.items():
+    for key, value in stats.items():
+        print(f"{key}: {value}")
 
-        print(f"{k}: {v}")
+    export_human_review_queue(
+        results_df
+    )
 
-    # -----------------------------------------------------
-    # Export Review Queue
-    # -----------------------------------------------------
+    results_df = apply_human_review(
+        results_df
+    )
 
-    export_human_review_queue(results_df)
+    export_final_results(
+        results_df
+    )
 
-    # -----------------------------------------------------
-    # Apply Human Review
-    # -----------------------------------------------------
+    gold = extract_new_gold_labels(
+        results_df
+    )
 
-    results_df = apply_human_review(results_df)
-
-    # -----------------------------------------------------
-    # Export Final Results
-    # -----------------------------------------------------
-
-    export_final_results(results_df)
-
-    # -----------------------------------------------------
-    # Gold Dataset
-    # -----------------------------------------------------
-
-    gold = extract_new_gold_labels(results_df)
-
-    save_gold_dataset(gold)
+    save_gold_dataset(
+        gold
+    )
 
     print()
-
     print("=" * 60)
-
     print("Pipeline Complete")
-
     print("=" * 60)
 
 
 if __name__ == "__main__":
-
     main()
