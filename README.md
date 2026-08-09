@@ -23,7 +23,7 @@ A Treater-inspired framework for evaluating customer email sentiment using a loc
 ## Project Structure
 
 ```text
-LLM-Evaluation-Framework/
+Sentiment-LLM-Evaluation/
 │
 ├── main.py
 ├── config.py
@@ -31,8 +31,18 @@ LLM-Evaluation-Framework/
 ├── llm.py
 ├── evaluation.py
 ├── review.py
-├── data/
-├── outputs/
-├── notebooks/
+├── requirements.txt
 ├── README.md
-└── requirements.txt
+│
+├── data/
+│   └── db2.csv
+│
+├── outputs/
+│   ├── final_results_20260809_115549.csv
+│   ├── gold_dataset.csv
+│   ├── human_review_queue.csv
+│   └── human_reviewed.csv
+│
+└── screenshots/
+    ├── img1.png
+    └── img2.png
